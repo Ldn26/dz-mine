@@ -1,10 +1,9 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { Calendar  } from "@/components/ui/calendar";
-
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
-
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
+import axios from "axios"
 import Image from 'next/image';
 import {
   Select,
@@ -14,10 +13,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 // import { useParams } from "next/navigation";
+import { ToastContainer , toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+
 import Link from "next/link";
-// import "@/styles/calendar.css"; // Optional for custom styles
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { useAxiosInterceptor } from "@/lib/AxiosIntercepter";
 
 export default function Page() {
+  const [Error,setError] = useState(null)
+  const pathname = usePathname();
+const [doctor,setDoctor] = useState(null)
+     const { setToken , setuserdata ,token } = useAuth();
+      const axiosInstance = useAxiosInterceptor();
+console.log("===== id ======")
+const doctorId = pathname.split("/").pop(); // Extract the doctor ID (5 in this case)
+console.log(doctorId)
   const [success ,setSucce ] = useState(false)
   const [selectedTime, setSelectedTime] = useState(null);
   const [Open , SetOpen]  = useState(false)
@@ -49,25 +61,8 @@ export default function Page() {
     adressImage: "https://loremflickr.com/640/480/city",
     id: "1",
   });
-
   const [selectedDate, setSelectedDate] = useState("");
-
   const [selectedType, setSelectedType] = useState("");
-
-  // const availableDates = [
-  //   "2024-01-01",
-  //   "2024-01-05",
-  //   "2024-01-10",
-  //   "2024-01-15",
-  // ];
-  // // const occupiedDates = ["2024-01-03", "2024-01-07"];
-
-
-  // const isAvailable = (date: Date) =>
-  //   availableDates.includes(date.toISOString().split("T")[0]);
-  // const isOccupied = (date: Date) =>
-  //   occupiedDates.includes(date.toISOString().split("T")[0]);
-
 
   const {
     register,
@@ -76,53 +71,49 @@ export default function Page() {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data) => {
 
+  useEffect(() => {
+
+    const  fetchDoctors  = async () => {
+      console.log(token)
+            axiosInstance.defaults.headers.common['Authorization'] = `JWT ${token}`;
+            try {
+              const Doctors = await axiosInstance.get(`/medical/doctor/${doctorId}`,
+            );
+              console.log("Doctor responese")
+              console.log(Doctors.data)
+              setDoctor(Doctors.data)
+              console.log("the Aceess token ")
+              console.log(token)
+              return Doctors.data.results    
+            } catch (error) {
+              console.error("Error during Geting Doctors:", error);
+              return [];
+            }
+      
+          };
+    fetchDoctors()
+  }, []); 
+
+console.log("Doctor")
+console.log(doctor)
+
+  const onSubmittt = async (data) => {
+console.log(data)
     console.log(data)
     const obj = {
-      name: data.name,
-      lastname: data.fam,
+      // name: data.name,
+      // lastname: data.fam,
+      time : data.time, 
+      date : data.date,
+      type : data.type,
+      status : "pending",
     };
+    console.log("the object ")
     console.log(obj);
-    setSucce(true)
-    // router.push("sucess")
-   
+  
+    // setSucce(true)
 
-  //   try {
-  //     const response = await fetch("http://127.0.0.1:8000/api/login/", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //  //       Authorization: `Bearer ${token}`,
-  //       },
-  //       body: JSON.stringify(obj),
-  //     });
-
-  //     if (!response.ok) {
-  //       const errorData = await response.json();
-  //       console.error(errorData.message);
-    
-  //       return;
-  //     }
-
-     
-
-  //     // Swal.fire({
-  //     //   title: "Login Successful",
-  //     //   icon: "success",
-  //     //   toast: true,
-  //     //   timer: 4000,
-  //     //   position: "top-right",
-  //     //   timerProgressBar: false,
-  //     //   showConfirmButton: false,
-  //     //   showCancelButton: true,
-  //     // });
- 
-
-  //     console.log("Logged in successfully");
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
   };
 
   const handleSelect = (date) => {
@@ -148,9 +139,73 @@ const timeArray = [
     "12h -- 13h"
   ];
 const typearray = [
-  "persential"  , 
-  "online"
+  "OFFLINE"  , 
+  "ONLINE"
 ]
+
+
+
+
+
+
+
+
+const onSubmit = async (data) => {
+
+
+    const obj = {
+      time : data.time, 
+      date : data.date,
+      type : data.type,
+      status : "pending",
+    };
+    console.log("the object ")
+    console.log(obj);
+
+
+
+
+
+  // if (!data.name || !data.fan || !data.date || !data.time || !data.type) {
+  //   setError('Please fill all  fields.');
+  //   return;
+  // }
+  setError('');
+  // setLoading(true); // Start loading
+
+console.log("token")
+  console.log(token)
+  axiosInstance.defaults.headers.common['Authorization'] = `JWT ${token}`;
+  await axios.post(`https://dztabib.onrender.com/medical/appointment/create/${doctorId}/`, 
+   {
+ obj
+    })
+    .then(async (res) => {
+      // setLoading(false);
+
+      console.log("response data ")
+      console.log(obj);
+
+   setSucce(true)
+   console.log(res.data)
+      toast.success(res.message, {
+        position: "top-right",
+      })
+      
+      router.push('/pages/dashPat/notification')
+    })
+    .catch((error) => {
+      // setLoading(false);
+      console.log(obj);
+
+      console.log("Error")
+      console.log(error); 
+      toast.error(error.response.data.detail, {
+        position: "top-right",
+      })
+    });
+
+};
 
 
 
@@ -168,11 +223,7 @@ const isOccupied = (date  ) =>
       date.getMonth() === occupied.getMonth() &&
       date.getDate() === occupied.getDate()
   );
-
-
-
   
-
 const handleSelectTime = (value) => {
   setSelectedTime(value);
   setValue("time", value);
@@ -186,7 +237,6 @@ const handleSelectType = (value) => {
 };
 
 
-
   return (
     <div className='flex flex-col items-center justify-center  w-full xl:flex-row'>
       {docDetails && !success && (
@@ -194,14 +244,14 @@ const handleSelectType = (value) => {
           {/* Details */}
           <div className='flex flex-col gap-8 items-center border  w-full justify-center p-4'>
            <div className="flex flex-row items-start      justify-center gap-4 ">
-              <Image src={docDetails.image} alt="doctor" className="rounded-full" width={200} height={200} />
+              <Image src={"/png/doc.png"} alt="doctor" className="rounded-full" width={200} height={200} />
   <div className="flex flex-col ">
 
               <div className='flex p-2 mt-4 flex-col bg-white rounded-3xl'>
-              <h1 className='text-primary text-2xl text-center font-semibold'>Mr: {docDetails.DoctorName} Ph.D</h1>
-              <h1 className='text-gray-600 text-xl text-center'>{docDetails.speciality}</h1>
+              <h1 className='text-primary text-2xl text-center font-semibold'>Mr: {doctor?.first_name}  {doctor?.last_name} Ph.D</h1>
+              <h1 className='text-gray-600 text-xl text-center'>{doctor?.speciality}</h1>
             </div>
-           <Link href={`${docDetails.id}`} className=' flex   items-center justify-center mt-2   p-2 bg-primary max-w-72   rounded-3xl'>
+           <Link href={`${doctor?.id}`} className=' flex   items-center justify-center mt-2   p-2 bg-primary max-w-72   rounded-3xl'>
                   <h1 className='text-white text-md text-lg text-center'>View Profile</h1>
                 </Link>
   </div>
@@ -372,6 +422,7 @@ const handleSelectType = (value) => {
 
           <button
             type="submit"
+      onClick={handleSubmit(onSubmit)}
             className="py-3 px-7  w-[450px] md:w-[540px] text-sm  font-medium  bg-primary text-white hover:shadow-xl   hover:shadow-indigo-500/40 transition-all duration-300 hover:scale-105"
           >
          Submit 
@@ -410,8 +461,7 @@ selected={selectedDate }
    
           </div>
 
-    
-        
+  
 
 
         </>
@@ -420,7 +470,7 @@ selected={selectedDate }
   <div className="flex items-center flex-col  justify-center">
     <IoCheckmarkCircleOutline color={"#0C72E1"} size={700} />
     
-    <Link href="" className="bg-primary py-3 text-xl  font-semibold text-white hover:scale-105 transition-all px-8 rounded-md">
+    <Link href={`/pages/dashPat/appointemente/${doctorId}`} className="bg-primary py-3 text-xl  font-semibold text-white hover:scale-105 transition-all px-8 rounded-md">
     View Appointement
     </Link>
 

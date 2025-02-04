@@ -8,19 +8,25 @@ import { FaLocationDot } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { FaGratipay } from "react-icons/fa";
 import { MdPriceChange } from "react-icons/md";
+import { useAxiosInterceptor } from "@/lib/AxiosIntercepter";
+import { useAuth } from "@/context/AuthContext";
+import AnimatedLoader from "@/components/loading";
 
 interface Doctor {
-  id: string;
-  DoctorName: string;
+  user_id: number;
+  doctor_id: number
+  first_name: string;
   image: string;
   location: string;
   speciality: string;
-  rate: number;
+  // rate: number;
   date: string;
   price: string;
 }
 
 const Search = () => {
+   const { token } = useAuth();
+    const axiosInstance = useAxiosInterceptor();
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -30,22 +36,30 @@ const Search = () => {
   const [selectedRating, setSelectedRating] = useState("");
   const [selectedSpeciality, setSelectedSpeciality] = useState("ALL");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  console.log("the Aceess token ")
+  console.log(token)
 
-  const fetchDoctors = async () => {
-    try {
-      const res = await fetch(
-        "https://672ddda3fd89797156440765.mockapi.io/Tabib/api/doctors/"
+    const  fetchDoctors  = async () => {
+ 
+  
+      axiosInstance.defaults.headers.common['Authorization'] = `JWT ${token}`;
+      try {
+        const Doctors = await axiosInstance.get("/medical/doctor/",
       );
-      if (!res.ok) {
-        throw new Error("Error fetching doctors");
+        console.log("Doctors responese")
+        console.log(Doctors.data)
+        console.log("the Aceess token ")
+        console.log(token)
+        return Doctors.data.results
+        ;     
+      } catch (error) {
+        console.error("Error during Geting Doctors:", error);
+        return [];
       }
-      const data = await res.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching doctors:", error);
-      return [];
-    }
-  };
+
+    };
+
+
 
   useEffect(() => {
     const getDoctors = async () => {
@@ -71,17 +85,19 @@ const Search = () => {
 
   const filteredDoctors = doctors.filter((doctor) => {
     return (
-      doctor.DoctorName?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      doctor.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedLocation === "" ||
         doctor.location?.toLowerCase() === selectedLocation.toLowerCase()) &&
-      (selectedPrice === "" ||
-        doctor.price?.toLowerCase() === selectedPrice.toLowerCase()) &&
-      (selectedRating === "" || doctor.rate?.toString() === selectedRating) &&
+      // (selectedPrice === "" ||
+        // doctor.price?.toLowerCase() === selectedPrice.toLowerCase()) &&
+      // (selectedRating === "" || doctor.rate?.toString() === selectedRating) &&
       (selectedSpeciality === "ALL" ||
         doctor.speciality?.toLowerCase() === selectedSpeciality.toLowerCase())
     );
   });
 
+  console.log(filteredDoctors)
+console.log(doctors)
   return (
     <div className="px-8 h-screen overflow-scroll pb-[100px]">
       <div className="flex flex-col md:flex-row items-center my-4 gap-4 justify-between">
@@ -158,17 +174,16 @@ const Search = () => {
 
       <SpecialitySelector onSpecialityChange={handleSpecialityChange} />
       <h1 className="text-3xl font-bold mb-4">Doctors:</h1>
-      {isLoading && <p>Loading...</p>}
+      {isLoading && <AnimatedLoader/>}
       {isError && <p>Error fetching doctors. Please try again later.</p>}
       {isSuccess && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-4 md:grid-cols-2 lg:gap-8">
           {filteredDoctors.map((doctor) => (
             <DoctorCard
-              key={doctor.id}
-              id={doctor.id}
-              rate={doctor.rate}
+              key={doctor.user_id}
+              id={doctor.doctor_id}
               image={doctor.image}
-              DoctorName={doctor.DoctorName}
+              DoctorName={doctor.first_name}
               location={doctor.location}
               speciality={doctor.speciality}
               date={doctor.date}

@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import AppointmentList from "../../../../components/docdashComp/list";
 import Dashhead from "../../../../components/docdashComp/dashHead"
 const Apoitments = () => {
-  const [search, setSearch] = useState(""); // State for search input
 
+  const [search, setSearch] = useState(""); // State for search input
   const appointments = [
     { id: "4", date: "2024-12-18", patient: "John Doe", type: "Checkup", number: "001", email: "john@example.com" },
     { id: "5", date: "2024-12-19", patient: "Jane Smith", type: "Consultation", number: "002", email: "jane@example.com" },

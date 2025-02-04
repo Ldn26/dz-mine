@@ -46,11 +46,11 @@ const LoginInputFields: React.FC<LoginInputFieldsProps> = ({ formData, handleInp
     <div className="space-y-4">
       {/* Name Field */}
       <div>
-        <label htmlFor="username" className="block text-[20px] text-gray-700">username</label>
+        <label htmlFor="username" className="block text-[20px] text-gray-700">Login</label>
         <input
           type="text"
           id="username"
-          name="username"
+          name="username" 
           value={formData.username}
           onChange={handleInputChangeWithValidation}
           placeholder="Enter your name"

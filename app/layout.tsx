@@ -1,4 +1,5 @@
 
+import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 export const metadata = {
@@ -13,11 +14,14 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+    <AuthProvider>
+      
       <body>
    
         {children}
       
       </body>
+    </AuthProvider>
     </html>
   );
 }

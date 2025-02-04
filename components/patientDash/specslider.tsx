@@ -11,12 +11,39 @@ const SpecialitySelector: React.FC<SpecialitySelectorProps> = ({ onSpecialityCha
   const [windowWidth, setWindowWidth] = useState<number>(0);
   const [translateX, setTranslateX] = useState<string>("translateX(0%)");
 
+  // const specialities = [
+  //   "ALL",
+  //   ...Array.from({ length: 5 }, (_, i) => `speciality ${i + 1}`), // Generates "speciality 1" to "speciality 19"
+  // ]
+
+  // const specialities = [
+  //   "ALL",
+  //   "Generalist",
+  //   "Cardiologist",
+  //   "Dermatologist",
+  //   "Pediatrician",
+  //   "Psychology",
+  // ];
+
   const specialities = [
     "ALL",
-    ...Array.from({ length: 19 }, (_, i) => `speciality ${i + 1}`), // Generates "speciality 1" to "speciality 19"
-  ]
-
-
+    "Generaliste",
+    "Cardiologist",
+    "Dermatologist",
+    "Pediatrician",
+    "Orthopedic",
+    "Neurologist",
+    "Psychiatrist",
+    "Endocrinologist",
+    "Oncologist",
+    "Ophthalmologist",
+    "Gynecologist",
+    "Pediatre",
+    "Rheumatologist",
+    "Gastroenterologist",
+  ];
+  
+  
   const [spec ,setspecialities ] = useState(specialities)
 
   const [dropdownSpecialities, setDropdownSpecialities] = useState<string[]>([]);

@@ -2,8 +2,12 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
+import { useAuth } from '@/context/AuthContext';
 const ProfilePage = () => {
+
+console.log("userdata from profile page")
+  const {userdata} = useAuth();
+  console.log(userdata)
   const [name, setName] = useState('Ravad Nadam');
   const [email, setEmail] = useState('0rwad.nadam0@gmail.com');
   const [password, setPassword] = useState('**********');

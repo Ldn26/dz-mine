@@ -6,23 +6,25 @@ import { FaStar } from "react-icons/fa";
 import { LuCalendarRange } from "react-icons/lu";
 
 interface DoctorCardProps {
-  rate: number;
+  // rate: number ;
   image: string;
-  id: string;
+  id: number;
   DoctorName: string;
   location: string;
   speciality: string;
   date: string;
 }
 
-const DoctorCard: React.FC<DoctorCardProps> = ({ rate, image, id, DoctorName, location, speciality, date }) => {
+const DoctorCard: React.FC<DoctorCardProps> = ({  id, DoctorName, location, speciality, date }) => {
   return (
     <div className="border border-primary hover:shadow-[0_0_40px_10px_rgba(0,100,255,0.2)] hover:scale-[1.02] cursor-pointer ease-in-out duration-200 transition-all rounded-2xl gap-4 relative h-[400px] bg-white flex flex-col justify-center items-center">
-      <Link href={id} className="flex flex-col mt-[10%] justify-center items-center">
+      <Link  href={`${id}`} className="flex flex-col mt-[10%] justify-center items-center">
         <div className="flex justify-center items-center">
+          
           <div className="relative rounded-full p-1 bg-white shadow-[0_0_40px_10px_rgba(0,100,255,0.2)]">
             <Image 
-              src={image} 
+              // src={image}  
+              src={"/png/doc.png"}
               alt={`${DoctorName} profile`} 
               className="rounded-full w-32 h-32" 
               width={96} 
@@ -39,7 +41,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ rate, image, id, DoctorName, lo
           </div>
           <div className="absolute -left-1 top-8 z-20 flex items-center space-x-2">
             <div className="clip-polygon bg-[#FFF3EF] w-[80px] h-[40px] transform border-none relative"></div>
-            <span className="text-[#FE7C42] absolute right-4 p-2 text-xl">{rate}</span>
+            <span className="text-[#FE7C42] absolute right-4 p-2 text-xl">5</span>
             <FaStar className="absolute" color="#FE7C42" size={22} />
           </div>
         </div>
@@ -50,7 +52,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ rate, image, id, DoctorName, lo
           <LuCalendarRange color="#969699" />
           <h1 className="text-[#969699] text-center">{date}</h1>
         </div>
-        <Link href="/dashPat/doctorProfile" className="bg-primary   hover:border-solid clip-reserve  rounded-br-2xl text-white text-center py-1 px-4">
+        <Link href={`/pages/dashPat/appointemente/${id}`} className="bg-primary   hover:border-solid clip-reserve  rounded-br-2xl text-white text-center py-1 px-4"   >
           Reserver
         </Link>
       </div>
